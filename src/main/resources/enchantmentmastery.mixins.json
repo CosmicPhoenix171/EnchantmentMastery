@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.enchantmentmastery.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "enchantmentmastery.refmap.json",
+  "mixins": [
+  ],
+  "client": [
+    "ItemStackMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

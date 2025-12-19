@@ -1,0 +1,30 @@
+{
+  "container.enchantmentmastery.mastery_enchanter": "Mastery Enchanter",
+
+  "enchantmentmastery.absorb.success": "Absorbed %s level %s!",
+  "enchantmentmastery.absorb.no_enchantment": "This book has no enchantment",
+  "enchantmentmastery.absorb.multiple_enchantments": "Can only absorb books with one enchantment",
+  "enchantmentmastery.absorb.level_too_high": "Cannot absorb level %s - need mastery level %s first",
+  "enchantmentmastery.absorb.already_learned": "Already learned this level or higher",
+  "enchantmentmastery.absorb.not_enough_xp": "Need %s XP levels (have %s)",
+  "enchantmentmastery.absorb.unknown_enchantment": "Unknown enchantment",
+
+  "enchantmentmastery.apply.success": "Applied %s level %s!",
+  "enchantmentmastery.apply.mastery_too_low": "Mastery level too low for this enchantment level",
+  "enchantmentmastery.apply.not_enough_xp": "Need %s XP levels (have %s)",
+  "enchantmentmastery.apply.incompatible_item": "This enchantment cannot be applied to this item",
+  "enchantmentmastery.apply.conflict": "This enchantment conflicts with an existing enchantment",
+
+  "enchantmentmastery.mastery_level_up": "Mastery increased for %s to level %s!",
+
+  "enchantmentmastery.decode.letter_unlocked": "Decoded letter: %s",
+
+  "enchantmentmastery.gui.apply": "Apply",
+  "enchantmentmastery.gui.select_enchantment": "Select an enchantment",
+  "enchantmentmastery.gui.no_enchantments": "No enchantments learned",
+  "enchantmentmastery.gui.cost": "Cost: %s levels",
+  "enchantmentmastery.gui.mastery_level": "Mastery: %s",
+
+  "enchantment.incompatible.item": "Enchantment cannot be applied to this item",
+  "enchantment.incompatible.conflict": "Enchantment conflicts with existing enchantments"
+}

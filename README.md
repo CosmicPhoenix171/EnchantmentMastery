@@ -1,87 +1,158 @@
-```text
-You are my senior Minecraft modding engineer. Help me build a Forge mod for the latest Minecraft Java version (1.21.x). The mod adds a per-player Enchantment Mastery system plus a Standard Galactic Alphabet decoding UI effect. Design for multiplayer correctness (server authority), persistence, and reasonable compatibility with other mods.
+# Enchantment Mastery
 
-Core features
+A Minecraft Forge mod for 1.21.x that adds a per-player Enchantment Mastery system with Standard Galactic Alphabet decoding UI effects.
 
-1) Per-player mastery data
-- Store per-player learned enchantments and their mastery levels and XP.
-- Persist across sessions and death.
-- Data model
-  - Map enchant_id -> mastery_level (unbounded, can get very high)
-  - Map enchant_id -> mastery_xp
-  - total_levels_spent (optional stat)
-- Mastery level is not clamped by vanilla enchant max, but must still respect conflicts and item compatibility when applying.
+## Features
 
-2) Absorb enchanted books
-- Player sneaks and right-clicks while holding an enchanted book to absorb it.
-- Only absorbable if the book contains exactly one stored enchantment. If multiple enchants, deny with a message.
-- Absorb costs XP levels (levels) and consumes the book.
-- Numeric progression requirement: to absorb level N of a specific enchant, the player must already have that enchant unlocked at level N-1. Absorb must be in order.
-- Absorb sets or increases the player mastery level for that enchant to N (if allowed).
-- Absorb should fail if player does not have enough levels.
+### 1. Per-Player Mastery Data
+- Each player has their own learned enchantments with mastery levels
+- Data persists across sessions and death
+- Mastery levels can exceed vanilla enchantment caps
+- Stored data includes:
+  - Enchantment ID → Mastery Level (unbounded)
+  - Enchantment ID → Mastery XP
+  - Total levels spent statistic
+  - Unlocked letter indices for decoding
 
-3) Apply learned enchants while enchanting
-- Provide a way to apply learned enchantments to items at an Enchanting Table without relying on vanilla random offers.
-- Preferred approach: sneak-right-click an Enchanting Table (with non-book item in hand) opens a custom “Mastery Enchanter” menu and screen.
-- Menu has an input slot for the item, optionally a lapis slot (decide: levels-only by default), and a scrollable list of learned enchantments.
-- Player selects an enchantment and a target level (1..player mastery level for that enchant).
-- Applying costs XP levels (levels), charges on server, updates the item, and increases mastery XP for that enchant based on the cost spent.
+### 2. Absorb Enchanted Books
+- **Sneak + Right-click** while holding an enchanted book to absorb it
+- Only books with exactly one enchantment can be absorbed
+- Sequential progression: Must have level N-1 to absorb level N
+- Costs XP levels (scales with book level)
+- Consumes the book on success
 
-4) Mastery leveling by use with scaling costs
-- Each time the player applies a learned enchant, add mastery XP to that enchant.
-- When XP crosses a threshold, increase mastery level by 1, and subtract required XP. Repeat if multiple levels gained.
-- The XP required per next level must ramp up like enchanting and continue indefinitely.
-- Provide a tunable progression math module with functions:
-  - absorbCostLevels(bookLevel)
-  - applyCostLevels(targetLevel)
-  - masteryXpToNext(currentMasteryLevel)
-  - masteryXpGainFromApplyCost(applyCostLevels)
+### 3. Mastery Enchanter
+- **Sneak + Right-click** an Enchanting Table (with non-book item) to open
+- Custom menu for applying learned enchantments
+- Select enchantment and target level (up to your mastery level)
+- Costs XP levels (scales with target level)
+- Respects vanilla enchantment compatibility and conflicts
 
-5) Keep vanilla enchants normal for compatibility but show true level in tooltip
-- Do NOT write extremely high levels into vanilla enchantments.
-- Keep the vanilla enchant level at its normal cap (or minimal needed), but store the true effective level separately (either per-item NBT tag or an item data component) as Map enchant_id -> effective_level.
-- Override the item tooltip so enchantment lines display the effective level using Roman numerals, not Arabic numbers.
-- Tooltip line should look like “Sharpness LXXIII”.
-- Provide a Roman numeral converter that supports very large integers by repeating M as needed.
+### 4. Mastery Leveling
+- Applying enchantments grants mastery XP
+- XP thresholds increase like enchanting costs
+- Level up to apply even higher level enchantments
 
-6) Decoding system for enchant names
-- Enchantment names initially display in Standard Galactic Alphabet look.
-- As players spend levels via absorbing and applying, the enchantment names slowly decode into English letter by letter.
-- Letters revealed are random but persistent (so it doesn’t reshuffle).
-- Decoding becomes more expensive as more letters are revealed, similar to enchanting scaling.
-- Implement decoding using mixed-font rendering: locked letters use minecraft:alt font, unlocked letters use normal font.
-- Store decoding progress per player (preferred) or per enchant mastery, but keep it consistent with “spend levels unlock letters”.
-- Use a stable set of unlocked letters or unlocked character indices so it persists and is deterministic per player.
-- Use only A–Z letters for unlock tracking; spaces and punctuation remain normal.
-- Apply decoding to the enchantment name portion only, while the Roman numeral level is always readable.
+### 5. True Effective Levels
+- Items store effective level separately from vanilla cap
+- Tooltip shows true level using Roman numerals
+- Example: "Sharpness LXXIII" for level 73
 
-Implementation requirements
+### 6. Standard Galactic Decoding
+- Enchantment names initially appear in Galactic alphabet
+- Spending levels gradually reveals letters
+- Letters unlock randomly but persistently per player
+- Uses mixed-font rendering (minecraft:alt for locked letters)
 
-- Use Forge events where possible. For Enchanting Table apply, implement a custom menu/screen instead of trying to hook vanilla offer selection.
-- Handle Enchanted Book stored enchantments via 1.21+ item data components (STORED_ENCHANTMENTS).
-- Handle item enchantments via 1.21+ data components (ENCHANTMENTS).
-- Validate enchant compatibility:
-  - Enchant can apply to the target item type
-  - No conflicts with existing enchants on the item
-- Server is authoritative for applying enchants and spending levels.
-- Sync capability data to client for UI and tooltip display using packets.
-- Provide clear file/class structure and step-by-step build order.
-- Write the code in Java 21, Forge MDK style, with minimal dependencies.
+## Project Structure
 
-Deliverables
+```
+src/main/java/com/enchantmentmastery/
+├── EnchantmentMastery.java          # Main mod class
+├── capability/
+│   ├── MasteryCapability.java       # Player data capability
+│   └── MasteryDataHelper.java       # Data access utilities
+├── client/
+│   ├── ClientModEvents.java         # Screen registration
+│   ├── EnchantmentDisplayHelper.java
+│   ├── TooltipHandler.java          # Custom tooltips
+│   └── screen/
+│       └── MasteryEnchanterScreen.java
+├── command/
+│   └── MasteryCommands.java         # Debug commands
+├── data/
+│   ├── EffectiveLevelsComponent.java
+│   └── ModDataComponents.java
+├── handler/
+│   ├── AbsorbHandler.java           # Book absorption
+│   ├── DecodingHandler.java         # Letter unlocking
+│   ├── MasteryEnchanterHandler.java # Menu opening
+│   └── PlayerSyncHandler.java       # Data sync events
+├── menu/
+│   └── MasteryEnchanterMenu.java    # Custom container
+├── mixin/
+│   └── ItemStackMixin.java          # Tooltip hook
+├── network/
+│   ├── ApplyEnchantmentPacket.java
+│   ├── ModNetworking.java
+│   └── SyncMasteryDataPacket.java
+├── registry/
+│   └── ModMenuTypes.java
+└── util/
+    ├── DecodingUtil.java            # Galactic text rendering
+    ├── EnchantComponentUtil.java    # Data component helpers
+    ├── EnchantRegistryUtil.java     # Registry lookups
+    ├── ProgressionMath.java         # Cost calculations
+    └── RomanNumerals.java           # Numeral conversion
+```
 
-- Suggested package layout and class list.
-- Capability definition, provider, attach and clone events, serialization.
-- Absorb handler code.
-- Menu provider + menu + screen skeleton.
-- Network packets for syncing mastery data and requesting apply.
-- Item tag/component storage for effective levels.
-- Tooltip override implementation using Roman numerals and decoding font mixing.
-- Utility modules:
-  - RomanNumerals
-  - ProgressionMath
-  - EnchantComponentUtil (read STORED_ENCHANTMENTS, set ENCHANTMENTS)
-  - EnchantRegistryUtil (lookup enchant by id, compatibility checks)
-- Notes about any Forge 1.21.x mapping differences I should watch for and how to find the right methods in my IDE.
+## Building
 
-Start by generating the project structure and the minimal working skeleton that compiles, then expand step-by-step into each feature.
+1. Ensure you have Java 21 installed
+2. Clone the repository
+3. Run `./gradlew build`
+4. Find the mod JAR in `build/libs/`
+
+## Development
+
+### Running the Client
+```bash
+./gradlew runClient
+```
+
+### Running the Server
+```bash
+./gradlew runServer
+```
+
+### Debug Commands
+
+- `/mastery list` - Show all learned enchantments
+- `/mastery set <enchant_id> <level>` - Set mastery level
+- `/mastery reset` - Reset all mastery data
+- `/mastery stats` - Show statistics
+
+## Progression Math
+
+All costs use quadratic scaling similar to vanilla enchanting:
+
+| Action | Formula |
+|--------|---------|
+| Absorb Cost | `3 * level + 1.5 * level²` |
+| Apply Cost | `2 * level + 1.2 * level²` |
+| Mastery XP Needed | `10 + level * 3 + level² * 1.5` |
+| XP Gain from Apply | `applyCost * 5` |
+| Decode Letter Cost | `1 + 0.5 * lettersUnlocked` |
+
+## Forge 1.21.x Notes
+
+### API Differences from Older Versions
+
+1. **Capabilities**: Uses Forge Capability system for player data
+2. **Data Components**: Items use data components instead of NBT tags
+3. **Codecs**: Serialization uses Mojang codecs
+4. **Packets**: Uses Forge SimpleChannel networking
+
+### Finding Methods in Your IDE
+
+- **Enchantment data**: `DataComponents.ENCHANTMENTS`, `DataComponents.STORED_ENCHANTMENTS`
+- **Registry access**: `level.registryAccess().registryOrThrow(Registries.ENCHANTMENT)`
+- **Component styling**: `Style.EMPTY.withFont(ResourceLocation)`
+- **Events**: Check `net.minecraftforge.event` package
+
+### Mapping Notes
+
+- Method names may differ between mappings
+- Use Parchment mappings for readable names
+- Check Forge documentation for renamed methods
+
+## Compatibility
+
+- Designed for multiplayer (server authoritative)
+- Data synced via packets
+- Uses data components for item storage
+- Should work with most other mods
+
+## License
+
+MIT License - See LICENSE file
