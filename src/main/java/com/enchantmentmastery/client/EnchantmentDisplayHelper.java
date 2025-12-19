@@ -16,6 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
+import net.minecraft.tags.EnchantmentTags;
 
 /**
  * Helper class for creating enchantment display components.
@@ -58,7 +59,7 @@ public final class EnchantmentDisplayHelper {
         }
 
         // Apply styling
-        if (enchant.isCurse()) {
+        if (holder.is(EnchantmentTags.CURSE)) {
             result = result.withStyle(ChatFormatting.RED);
         } else {
             result = result.withStyle(ChatFormatting.GRAY);
@@ -112,7 +113,7 @@ public final class EnchantmentDisplayHelper {
             result = result.append(Component.literal(" " + romanLevel));
         }
 
-        if (enchant.isCurse()) {
+        if (holder.is(EnchantmentTags.CURSE)) {
             result = result.withStyle(ChatFormatting.RED);
         } else {
             result = result.withStyle(ChatFormatting.GRAY);

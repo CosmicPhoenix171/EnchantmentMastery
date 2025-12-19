@@ -13,6 +13,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -151,7 +152,7 @@ public class MasteryEnchanterScreen extends AbstractContainerScreen<MasteryEncha
         if (selectedEnchantId == null || selectedLevel <= 0) return;
 
         // Send packet to server
-        ModNetworking.CHANNEL.sendToServer(new ApplyEnchantmentPacket(selectedEnchantId, selectedLevel));
+        ModNetworking.CHANNEL.send(new ApplyEnchantmentPacket(selectedEnchantId, selectedLevel), PacketDistributor.SERVER.noArg());
 
         // Reset selection
         selectedEnchantId = null;

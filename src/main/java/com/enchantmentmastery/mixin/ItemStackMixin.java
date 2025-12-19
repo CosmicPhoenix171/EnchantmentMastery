@@ -16,11 +16,14 @@ import java.util.List;
 /**
  * Mixin to intercept and modify enchantment tooltip lines.
  * This provides a hook point for our custom tooltip handler.
+ * 
+ * Note: For 1.21.1, we primarily use the ItemTooltipEvent via TooltipHandler.
+ * This mixin is kept as a backup hook point with remap=false to avoid SRG mapping issues.
  */
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
 
-    @Inject(method = "getTooltipLines", at = @At("RETURN"))
+    @Inject(method = "getTooltipLines", at = @At("RETURN"), remap = false)
     private void enchantmentmastery$modifyEnchantmentTooltips(
             Item.TooltipContext context,
             Player player,

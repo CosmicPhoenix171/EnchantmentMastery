@@ -1,26 +1,26 @@
 modLoader="javafml"
 loaderVersion="[52,)"
-license="${mod_license}"
+license="MIT"
 issueTrackerURL="https://github.com/CosmicPhoenix171/EnchantmentMastery/issues"
 
 [[mods]]
-modId="${mod_id}"
+modId="enchantmentmastery"
 version="${mod_version}"
-displayName="${mod_name}"
-authors="${mod_authors}"
-description='''${mod_description}'''
+displayName="Enchantment Mastery"
+authors="CosmicPhoenix171"
+description='''A per-player Enchantment Mastery system with Standard Galactic Alphabet decoding.'''
 
 [[mixins]]
-config="${mod_id}.mixins.json"
+config="enchantmentmastery.mixins.json"
 
-[[dependencies.${mod_id}]]
+[[dependencies.enchantmentmastery]]
     modId="forge"
     mandatory=true
     versionRange="[52,)"
     ordering="NONE"
     side="BOTH"
 
-[[dependencies.${mod_id}]]
+[[dependencies.enchantmentmastery]]
     modId="minecraft"
     mandatory=true
     versionRange="[1.21.1,1.22)"

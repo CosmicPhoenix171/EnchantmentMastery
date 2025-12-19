@@ -18,6 +18,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
+import net.minecraft.tags.EnchantmentTags;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -130,7 +131,7 @@ public class TooltipHandler {
         }
 
         // Apply curse coloring if applicable
-        if (enchant.isCurse()) {
+        if (holder.is(EnchantmentTags.CURSE)) {
             result = result.withStyle(ChatFormatting.RED);
         } else {
             result = result.withStyle(ChatFormatting.GRAY);
